@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Gaga Hulala</title>
+
+    <!-- PWA 元标签 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gaga Hulala">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎡</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎡</text></svg>">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdhZ2EgSHVsYWxhIOKAkyDnrZTpopjovbDnm5giLAogICJzaG9ydF9uYW1lIjogIkdhZ2EgSHVsYWxhIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxYTFhMmUiLAogICJ0aGVtZV9jb2xvciI6ICIjMWExYTJlIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJyUzRSUzQ3RleHQgeT0nLjllbScgZm9udC1zaXplPSc5MCclM0UlQjglQkQlRTYlQkMlOTQlRTglQkQlQUMlRTclOUIlOTglM0MvdGV4dCUzRSUzQy9zdmclM0UiLAogICAgICAic2l6ZXMiOiAiMTgweDE4MCIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+
+    <!-- 引入 Limelight 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Limelight&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --gold: #f0c040;
+            --text: #f0e6d3;
+            --accent: #e2b04a;
+            --border: #3a3050;
+            --shadow: 0 10px 30px rgba(0,0,0,0.45);
+            --radius: 22px;
+            --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(ellipse at 20% 20%, #2a2040 0%, transparent 55%),
+                              radial-gradient(ellipse at 80% 70%, #1e2a3a 0%, transparent 55%);
+            font-family: var(--font);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            padding-top: env(safe-area-inset-top, 16px);
+            padding-bottom: env(safe-area-inset-bottom, 16px);
+        }
+        .game-container {
+            display: flex;
+            gap: 28px;
+            max-width: 1080px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch;
+        }
+        .quiz-panel {
+            flex: 1 1 420px;
+            max-width: 520px;
+            min-width: 340px;
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 26px 22px 22px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .game-title {
+            font-family: 'Limelight', 'Broadway BT', 'Broadway', cursive;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #f0c040, #ff6b8a, #7ec8e3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+        .quiz-header {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .quiz-header .quiz-title {
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        .quiz-header .badges-row {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 4px;
+            justify-content: space-between;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 4px 8px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+        .badge-coin { background: rgba(240,192,64,0.18); border: 1.5px solid rgba(240,192,64,0.5); color: #fde28b; }
+        .badge-sticker { background: rgba(255,160,100,0.18); border: 1.5px solid rgba(255,160,100,0.5); color: #ffb888; }
+        .badge-spin { background: rgba(255,130,180,0.18); border: 1.5px solid rgba(255,150,190,0.5); color: #ffb8d0; }
+        .badge-progress { background: rgba(140,180,220,0.15); border: 1.5px solid rgba(140,180,220,0.4); color: #bcd4f0; font-size:0.7rem; }
+        .question-box {
+            background: rgba(255,255,255,0.03);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .question-emoji { font-size: 2.2rem; }
+        .question-text { font-size: 1.1rem; font-weight: 600; color: #fff; }
+        .tag { font-size: 0.7rem; padding: 2px 10px; border-radius: 20px; font-weight: 600; }
+        .tag-cn { background: rgba(100,180,255,0.2); color: #8cc4ff; }
+        .tag-en { background: rgba(255,160,100,0.2); color: #ffb888; }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .option-btn {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: #e8e0d5;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            font-family: var(--font);
+        }
+        .option-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.35); transform: translateY(-2px); }
+        .option-btn.correct { background: rgba(92,184,120,0.35); border-color: #5cb878; }
+        .option-btn.wrong { background: rgba(224,85,85,0.35); border-color: #e05555; animation: shake 0.4s; }
+        @keyframes shake { 0%,100%{transform: translateX(0);} 20%{transform: translateX(-5px);} 40%{transform: translateX(5px);} 60%{transform: translateX(-3px);} 80%{transform: translateX(3px);} }
+        .btn-skip {
+            padding: 10px 18px;
+            border-radius: 40px;
+            border: 2px solid rgba(240,192,64,0.5);
+            background: rgba(240,192,64,0.1);
+            color: #fde28b;
+            cursor: pointer;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font);
+        }
+        .btn-skip:disabled { opacity: 0.4; cursor: not-allowed; }
+        .feedback-msg { min-height: 24px; font-weight: 700; text-align: center; }
+        .wheel-panel {
+            flex: 0 1 450px;
+            min-width: 350px;
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 22px 20px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .wheel-wrapper {
+            position: relative;
+            width: 340px;
+            height: 340px;
+        }
+        .wheel-spin-container { width: 100%; height: 100%; border-radius: 50%; transition: none; }
+        canvas { width: 100%; height: 100%; display: block; border-radius: 50%; }
+        .pointer {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 0; height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 28px solid #ff4757;
+            filter: drop-shadow(0 4px 8px rgba(255,71,87,0.5));
+        }
+        .center-circle {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            width: 48px; height: 48px;
+            background: radial-gradient(circle, #fff 0%, #e8d5b0 50%, #c4a060 100%);
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border: 3px solid #b89050;
+        }
+        .btn-spin {
+            padding: 14px 36px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #ff6b8a, #e8456b);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(232,69,107,0.4);
+            font-family: var(--font);
+            transition: 0.2s;
+        }
+        .btn-spin:disabled { background: #5a5a6e; cursor: not-allowed; box-shadow: none; opacity: 0.6; }
+        .btn-spin.ready { animation: glowPulse 1.8s infinite; }
+        @keyframes glowPulse { 0%,100%{ box-shadow: 0 6px 20px rgba(232,69,107,0.4); } 50%{ box-shadow: 0 6px 40px rgba(255,100,140,0.85); } }
+        .collect-grid {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .collect-item {
+            font-size: 1.4rem;
+            padding: 4px 8px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            opacity: 0.4;
+            transition: 0.2s;
+        }
+        .collect-item.collected { opacity: 1; border-color: var(--gold); background: rgba(240,192,64,0.15); box-shadow: 0 0 12px rgba(240,192,64,0.3); }
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.7); z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-dialog {
+            background: #1e2840;
+            border-radius: 22px;
+            padding: 28px 24px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            animation: popIn 0.3s;
+        }
+        @keyframes popIn { from{transform: scale(0.8); opacity:0;} to{transform: scale(1); opacity:1;} }
+        .modal-emoji { font-size: 3.5rem; }
+        .modal-title { font-size: 1.5rem; font-weight: 800; margin: 8px 0; }
+        .modal-btn {
+            padding: 12px 30px; border-radius: 40px; border: none;
+            background: var(--accent); color: #1a1a2e; font-weight: 700;
+            cursor: pointer; margin-top: 12px;
+        }
+        .particles-container { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 99; }
+        .particle {
+            position: absolute; font-size: 1.8rem;
+            animation: particleFall 1.2s ease-out forwards;
+        }
+        @keyframes particleFall { 0%{opacity:1; transform: translateY(0) rotate(0deg);} 100%{opacity:0; transform: translateY(160px) rotate(360deg);} }
+        @media (max-width: 768px) {
+            .game-container { flex-direction: column; align-items: center; }
+            .wheel-wrapper { width: 280px; height: 280px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="quiz-panel" id="quizPanel">
+        <div class="game-title">✨ Gaga Hulala</div>
+        <div class="quiz-header">
+            <div class="quiz-title">🎊 百万寿星妹</div>
+            <div class="badges-row">
+                <span class="badge badge-coin">🪙 <span id="coinCount">5</span></span>
+                <span class="badge badge-sticker">🎖️ <span id="stickerCount">0</span></span>
+                <span class="badge badge-spin">🎡 <span id="spinChancesBadge">0</span>次</span>
+                <span class="badge badge-progress">📋 <span id="questionRemaining">60</span>题</span>
+            </div>
+        </div>
+        <div class="question-box">
+            <span class="question-emoji" id="questionEmoji">❓</span>
+            <div>
+                <span class="tag tag-cn" id="questionTag">常识</span>
+                <div class="question-text" id="questionText">加载中...</div>
+            </div>
+        </div>
+        <div class="options-grid" id="optionsGrid"></div>
+        <button class="btn-skip" id="btnSkip">⏭️ 跳过 (-1🪙)</button>
+        <div class="feedback-msg" id="feedbackMsg"></div>
+    </div>
+    <div class="wheel-panel">
+        <div style="font-weight:700;">🏂 Spin the World !! 💫</div>
+        <div class="wheel-wrapper" id="wheelWrapper">
+            <div class="pointer"></div>
+            <div class="center-circle"></div>
+            <div class="wheel-spin-container" id="wheelSpinContainer">
+                <canvas id="wheelCanvas" width="400" height="400"></canvas>
+            </div>
+        </div>
+        <div style="font-weight:700; color:#ffb8d0;">转盘机会：<span id="spinChancesText">0</span> 次</div>
+        <div class="collect-grid" id="collectGrid">
+            <span class="collect-item" data-key="谁能想到呢🍑">🍑</span>
+            <span class="collect-item" data-key="哥本哈根隔离🍺">🍺</span>
+            <span class="collect-item" data-key="🎉喵喵嗷嗷嗷😼">😼</span>
+            <span class="collect-item" data-key="🔮hi～蔑时陈">🔮</span>
+        </div>
+        <button class="btn-spin" id="btnSpin" disabled>🎯 转动转盘</button>
+    </div>
+</div>
+<div class="modal-overlay" id="modalOverlay" style="display:none;">
+    <div class="modal-dialog" id="modalDialog"></div>
+</div>
+<div class="particles-container" id="particlesContainer"></div>
+
+<script>
+// ---------- 注册 Service Worker 实现离线缓存 ----------
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register("data:application/javascript," + encodeURIComponent(
+            `self.addEventListener('install',e=>{e.waitUntil(caches.open('gaga-v1').then(c=>c.addAll([location.href])))})` +
+            `self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))})`
+        )).catch(err => console.log('SW 注册失败（可能不支持内联 worker）', err));
+    });
+}
+</script>
+
+<script>
+(function(){
+    // ---------- 游戏状态 ----------
+    let coins = 5;
+    let stickers = 0;
+    let spinChances = 0;
+    let isSpinning = false;
+    let currentAngle = 0;
+    let quizLocked = false;
+    let questionPool = [];
+    let currentQuestion = null;
+
+    const specialFour = ['谁能想到呢🍑', '哥本哈根隔离🍺', '🎉喵喵嗷嗷嗷😼', '🔮hi～蔑时陈'];
+    let collected = {};
+    specialFour.forEach(k => collected[k] = false);
+    let sectorHitCounts = {};
+
+    const $coin = document.getElementById('coinCount');
+    const $sticker = document.getElementById('stickerCount');
+    const $spinBadge = document.getElementById('spinChancesBadge');
+    const $spinText = document.getElementById('spinChancesText');
+    const $questionRemain = document.getElementById('questionRemaining');
+    const $qEmoji = document.getElementById('questionEmoji');
+    const $qTag = document.getElementById('questionTag');
+    const $qText = document.getElementById('questionText');
+    const $optionsGrid = document.getElementById('optionsGrid');
+    const $btnSkip = document.getElementById('btnSkip');
+    const $feedback = document.getElementById('feedbackMsg');
+    const $btnSpin = document.getElementById('btnSpin');
+    const $wheelContainer = document.getElementById('wheelSpinContainer');
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const $modalOverlay = document.getElementById('modalOverlay');
+    const $modalDialog = document.getElementById('modalDialog');
+    const $particles = document.getElementById('particlesContainer');
+    const $collectGrid = document.getElementById('collectGrid');
+
+    function getEmojiForLabel(label){
+        const map = {
+            '快乐说hi hi🌈': '🌈',
+            '🥳豪俾你～': '🥳',
+            '谁能想到呢🍑': '🍑',
+            '生日快乐🎂': '🎂',
+            '哥本哈根隔离🍺': '🍺',
+            '🎉喵喵嗷嗷嗷😼': '😼',
+            '🪙Go to猪': '🪙',
+            '🔮hi～蔑时陈': '🔮',
+            '🚨‼️MariaGa~': '🔓'
+        };
+        return map[label] || '✨';
+    }
+
+    function getSectorDefinitions(){
+        const isActivated = specialFour.every(k => collected[k]);
+
+        if (isActivated) {
+            const labels = ['快乐说hi hi🌈', '生日快乐🎂', '🚨‼️MariaGa~'];
+            const angle = 120;
+            let cum = 0;
+            const sectors = [];
+            for (let label of labels) {
+                const start = cum;
+                const end = cum + angle;
+                cum = end;
+                sectors.push({
+                    label, angle: angle, start, end,
+                    color: getColor(label), light: getLightColor(label),
+                    rewardType: getRewardType(label), emoji: getEmojiForLabel(label)
+                });
+            }
+            return sectors;
+        } else {
+            const basePct = {
+                '快乐说hi hi🌈': 13,
+                '🥳豪俾你～': 18,
+                '谁能想到呢🍑': 8.5,
+                '生日快乐🎂': 22,
+                '哥本哈根隔离🍺': 8.5,
+                '🎉喵喵嗷嗷嗷😼': 8.5,
+                '🪙Go to猪': 13,
+                '🔮hi～蔑时陈': 8.5
+            };
+            const order = [
+                '快乐说hi hi🌈',
+                '谁能想到呢🍑',
+                '🪙Go to猪',
+                '哥本哈根隔离🍺',
+                '生日快乐🎂',
+                '🎉喵喵嗷嗷嗷😼',
+                '🥳豪俾你～',
+                '🔮hi～蔑时陈'
+            ];
+            let cum = 0;
+            const sectors = [];
+            for (let label of order) {
+                const angleDeg = basePct[label] * 3.6;
+                const start = cum;
+                const end = cum + angleDeg;
+                cum = end;
+                sectors.push({
+                    label, angle: angleDeg, start, end,
+                    color: getColor(label), light: getLightColor(label),
+                    rewardType: getRewardType(label), emoji: getEmojiForLabel(label)
+                });
+            }
+            return sectors;
+        }
+    }
+
+    const colorMap = {
+        '快乐说hi hi🌈': '#f8d941',
+        '谁能想到呢🍑': '#fd9f9d',
+        '🪙Go to猪': '#fe7748',
+        '哥本哈根隔离🍺': '#f9cdbc',
+        '生日快乐🎂': '#cbd6c8',
+        '🎉喵喵嗷嗷嗷😼': '#94c3bc',
+        '🥳豪俾你～': '#70b0b0',
+        '🔮hi～蔑时陈': '#8db6cb'
+    };
+
+    const lightMap = {
+        '快乐说hi hi🌈': '#fce98a',
+        '谁能想到呢🍑': '#fecbc9',
+        '🪙Go to猪': '#ffa785',
+        '哥本哈根隔离🍺': '#fce5dd',
+        '生日快乐🎂': '#e2eae0',
+        '🎉喵喵嗷嗷嗷😼': '#c2d9d4',
+        '🥳豪俾你～': '#a8cfcf',
+        '🔮hi～蔑时陈': '#b8d4e2'
+    };
+
+    const mariagaColor = '#fd9f9d';
+    const mariagaLight = '#fecbc9';
+
+    function getColor(label){
+        if (label === '🚨‼️MariaGa~') return mariagaColor;
+        return colorMap[label] || '#888';
+    }
+    function getLightColor(label){
+        if (label === '🚨‼️MariaGa~') return mariagaLight;
+        return lightMap[label] || '#aaa';
+    }
+
+    function getRewardType(label){
+        if (label === '快乐说hi hi🌈' || label === '生日快乐🎂') return 'coins1';
+        if (label === '🥳豪俾你～') return 'retry';
+        if (label === '🪙Go to猪') return null;
+        return 'retrySecond';
+    }
+
+    let sectors = [];
+    let boundaries = [];
+
+    function updateSectors(){
+        sectors = getSectorDefinitions();
+        boundaries = sectors.map(s => ({...s}));
+    }
+
+    function drawWheel(){
+        updateSectors();
+        const cx=200, cy=200, r=192;
+        ctx.clearRect(0,0,400,400);
+        ctx.beginPath(); ctx.arc(cx,cy,r+4,0,Math.PI*2); ctx.fillStyle='#3a3050'; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx,cy,r+2,0,Math.PI*2); ctx.fillStyle='#5a4a70'; ctx.fill();
+        let startRad = -Math.PI/2;
+        sectors.forEach(s => {
+            const ang = s.angle/360*Math.PI*2;
+            const endRad = startRad+ang;
+            const mid = startRad+ang/2;
+            const grad = ctx.createRadialGradient(cx,cy,r*0.2,cx,cy,r);
+            grad.addColorStop(0, s.light); grad.addColorStop(1, s.color);
+            ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,startRad,endRad); ctx.closePath();
+            ctx.fillStyle = grad; ctx.fill();
+            ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=1.5; ctx.stroke();
+            const tx = cx+Math.cos(mid)*r*0.68, ty = cy+Math.sin(mid)*r*0.68;
+            ctx.save(); ctx.translate(tx,ty); ctx.rotate(mid+Math.PI/2);
+            ctx.fillStyle='#1a1a2e';
+            let fontSize = s.angle >= 120 ? 16 : s.angle > 40 ? 11 : 8;
+            ctx.font = `bold ${fontSize}px "PingFang SC","Microsoft YaHei"`;
+            ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(s.label,0,0);
+            ctx.restore();
+            startRad = endRad;
+        });
+        const ig = ctx.createRadialGradient(cx,cy,0,cx,cy,30);
+        ig.addColorStop(0,'#fff'); ig.addColorStop(0.5,'#f0e0c0'); ig.addColorStop(1,'#c8a870');
+        ctx.beginPath(); ctx.arc(cx,cy,26,0,Math.PI*2); ctx.fillStyle=ig; ctx.fill();
+        ctx.strokeStyle='#b89050'; ctx.lineWidth=2; ctx.stroke();
+        for(let i=0;i<24;i++){
+            const a = i/24*Math.PI*2-Math.PI/2;
+            ctx.beginPath(); ctx.arc(cx+Math.cos(a)*(r-1), cy+Math.sin(a)*(r-1), 2.5, 0, Math.PI*2);
+            ctx.fillStyle = i%2===0?'#fff':'#ffd700'; ctx.fill();
+        }
+    }
+
+    function getSectorByAngle(totalDeg){
+        let ptr = ((360 - totalDeg%360)%360+360)%360;
+        for(let b of boundaries) {
+            let s = b.start % 360, e = b.end % 360;
+            if(e < s) e += 360;
+            if(ptr >= s && ptr < e) return b;
+            if(ptr+360 >= s && ptr+360 < e) return b;
+        }
+        return boundaries[boundaries.length-1];
+    }
+
+    function spin(){
+        if(isSpinning || spinChances<=0) return;
+        isSpinning=true; spinChances--; updateUI();
+        $btnSpin.disabled=true; $btnSpin.classList.remove('ready');
+        const extra = 5+Math.floor(Math.random()*6);
+        const offset = Math.random()*360;
+        const target = currentAngle + extra*360 + offset;
+        const start = currentAngle;
+        const duration = 4000+Math.random()*1500;
+        const startTime = performance.now();
+        function anim(now){
+            const p = Math.min((now-startTime)/duration,1);
+            const eased = 1 - Math.pow(1-p, 3.5);
+            currentAngle = start + (target-start)*eased;
+            $wheelContainer.style.transform = `rotate(${currentAngle}deg)`;
+            if(p<1) requestAnimationFrame(anim);
+            else {
+                currentAngle = target;
+                $wheelContainer.style.transform = `rotate(${target}deg)`;
+                isSpinning = false;
+                handleResult(getSectorByAngle(target));
+            }
+        }
+        requestAnimationFrame(anim);
+    }
+
+    function handleResult(sector){
+        const label = sector.label;
+        if (!sectorHitCounts[label]) sectorHitCounts[label] = 0;
+        sectorHitCounts[label]++;
+        const times = sectorHitCounts[label];
+
+        if (label === '🚨‼️MariaGa~') {
+            spinChances++;
+            updateUI();
+            spawnParticles('🎂🎉', 15);
+            showModal('🎂', '恭祝您福寿与天齐!!', '生日快乐!! 限时特优!!不用188!!不用88!!只要8.28!!', '棒棒哒！请扫码！🤪');
+            if(spinChances>0 && !isSpinning) { $btnSpin.disabled=false; $btnSpin.classList.add('ready'); }
+            else { $btnSpin.disabled=true; $btnSpin.classList.remove('ready'); }
+            return;
+        }
+
+        if (sector.rewardType === 'retry') {
+            spinChances++;
+            updateUI();
+            spawnParticles('🥳',15);
+            showModal('🥳','🥳豪俾你～！','获得额外一次转盘机会！','客鸠气～');
+        } else if (sector.rewardType === null) {
+            spawnParticles('💨',8);
+            showModal(sector.emoji, label, '请投币~','好的');
+        } else if (sector.rewardType === 'coins1') {
+            stickers += 1;
+            updateUI();
+            spawnParticles('🎖️',8);
+            showModal(sector.emoji, label, '获得 <b>贴纸一枚</b>！','好的');
+        } else if (sector.rewardType === 'retrySecond') {
+            if (times === 1) {
+                if (specialFour.includes(label)) {
+                    collected[label] = true;
+                    updateCollectGrid();
+                    if (specialFour.every(k => collected[k])) {
+                        spawnParticles('✨',6);
+                        showModal(sector.emoji, label, 'wow wow wow~~', '好的', () => {
+                            drawWheel();
+                            spawnParticles('🔓✨',10);
+                            showModal('🔓', '🚨‼️MariaGa~', 'Boarden Horizons !!!!','太棒了');
+                        });
+                        if(spinChances>0 && !isSpinning) { $btnSpin.disabled=false; $btnSpin.classList.add('ready'); }
+                        else { $btnSpin.disabled=true; $btnSpin.classList.remove('ready'); }
+                        return;
+                    }
+                }
+                spawnParticles('✨',6);
+                showModal(sector.emoji, label, 'wow wow wow~~','好的');
+            } else {
+                spinChances++;
+                updateUI();
+                spawnParticles('🔄🥳',12);
+                showModal(sector.emoji, label, '<b>再来一次！</b>！','GO ! !');
+            }
+        }
+
+        if(spinChances>0 && !isSpinning) { $btnSpin.disabled=false; $btnSpin.classList.add('ready'); }
+        else { $btnSpin.disabled=true; $btnSpin.classList.remove('ready'); }
+    }
+
+    function updateCollectGrid(){
+        document.querySelectorAll('.collect-item').forEach(el => {
+            el.classList.toggle('collected', collected[el.dataset.key]);
+        });
+    }
+
+    function showModal(emoji, title, desc, btnText, onClose) {
+        $modalDialog.innerHTML = `
+            <div class="modal-emoji">${emoji}</div>
+            <div class="modal-title">${title}</div>
+            <div style="margin:8px 0; color:#c4b998;">${desc}</div>
+            <button class="modal-btn" id="modalCloseBtn">${btnText}</button>
+        `;
+        $modalOverlay.style.display = 'flex';
+        document.getElementById('modalCloseBtn').onclick = () => {
+            $modalOverlay.style.display = 'none';
+            if (typeof onClose === 'function') onClose();
+        };
+        $modalOverlay.onclick = e => {
+            if (e.target === $modalOverlay) {
+                $modalOverlay.style.display = 'none';
+                if (typeof onClose === 'function') onClose();
+            }
+        };
+    }
+
+    function spawnParticles(emojiStr, count){
+        const rect = document.getElementById('wheelWrapper').getBoundingClientRect();
+        const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
+        const emojis = Array.from(emojiStr);
+        for(let i=0;i<count;i++){
+            const p = document.createElement('span');
+            p.className='particle';
+            p.textContent=emojis[Math.floor(Math.random()*emojis.length)]||'✨';
+            p.style.left = (cx+(Math.random()-0.5)*200)+'px';
+            p.style.top = (cy+(Math.random()-0.5)*100)+'px';
+            $particles.appendChild(p);
+            setTimeout(()=>p.remove(), 1300);
+        }
+    }
+
+    function redistributeAnswers(questions) {
+        let targetAns = 0;
+        return questions.map(q => {
+            const correctText = q.opts[q.ans];
+            const wrongTexts = q.opts.filter((_, idx) => idx !== q.ans);
+            const newOpts = [];
+            for (let i = 0; i < 4; i++) {
+                if (i === targetAns) {
+                    newOpts.push(correctText);
+                } else {
+                    newOpts.push(wrongTexts.shift());
+                }
+            }
+            q.opts = newOpts;
+            q.ans = targetAns;
+            targetAns = (targetAns + 1) % 4;
+            return q;
+        });
+    }
+
+    function buildPool(){
+        const originalQuestions = [
+            {type:'cn',emoji:'🏛️',q:'世界上现存最大的古代宫殿建筑群是？',opts:['凡尔赛宫','故宫','白金汉宫','克里姆林宫'],ans:1},
+            {type:'cn',emoji:'📜',q:'“为中华之崛起而读书”是谁的名言？',opts:['毛泽东','周恩来','邓小平','朱德'],ans:1},
+            {type:'cn',emoji:'🌍',q:'非洲最高的山峰是？',opts:['乞力马扎罗山','肯尼亚山','鲁文佐里山','阿特拉斯山'],ans:0},
+            {type:'cn',emoji:'🎭',q:'莎士比亚四大悲剧不包括？',opts:['《哈姆雷特》','《奥赛罗》','《罗密欧与朱丽叶》','《麦克白》'],ans:2},
+            {type:'cn',emoji:'🔢',q:'二进制中十进制10如何表示？',opts:['1001','1010','1100','1110'],ans:1},
+            {type:'cn',emoji:'🧪',q:'原子序数79的元素是？',opts:['银','铂','金','汞'],ans:2},
+            {type:'cn',emoji:'📚',q:'《百年孤独》作者是？',opts:['略萨','马尔克斯','博尔赫斯','聂鲁达'],ans:1},
+            {type:'cn',emoji:'🎵',q:'贝多芬第九交响曲又称？',opts:['英雄','命运','田园','合唱'],ans:3},
+            {type:'cn',emoji:'🏺',q:'青花瓷最兴盛朝代？',opts:['唐','宋','元','明'],ans:2},
+            {type:'cn',emoji:'🧠',q:'大脑视觉区位于？',opts:['额叶','顶叶','枕叶','颞叶'],ans:2},
+            {type:'cn',emoji:'🌌',q:'离太阳系最近恒星？',opts:['天狼星','比邻星','织女星','北极星'],ans:1},
+            {type:'cn',emoji:'🏦',q:'第一家证券交易所成立于？',opts:['伦敦','纽约','阿姆斯特丹','巴黎'],ans:2},
+            {type:'cn',emoji:'🎨',q:'梵高《星月夜》创作于？',opts:['1887','1888','1889','1890'],ans:2},
+            {type:'cn',emoji:'🔤',q:'英文有多少个字母？',opts:['24','25','26','27'],ans:2},
+            {type:'cn',emoji:'🏆',q:'世界杯几年一届？',opts:['2','3','4','5'],ans:2},
+            {type:'cn',emoji:'🧬',q:'DNA双螺旋发现者？',opts:['达尔文','孟德尔','沃森和克里克','巴斯德'],ans:2},
+            {type:'cn',emoji:'🗿',q:'复活节岛位于？',opts:['大西洋','印度洋','太平洋','北冰洋'],ans:2},
+            {type:'cn',emoji:'🎞️',q:'《肖申克的救赎》原著作者？',opts:['斯蒂芬·金','丹·布朗','阿加莎','海明威'],ans:0},
+            {type:'cn',emoji:'☕',q:'咖啡原产地？',opts:['巴西','哥伦比亚','埃塞俄比亚','越南'],ans:2},
+            {type:'cn',emoji:'🦖',q:'恐龙灭绝大约在？',opts:['650万年前','6500万年前','6.5亿年前','65亿年前'],ans:1},
+            {type:'cn',emoji:'🎻',q:'被称为乐器之王的是？',opts:['小提琴','钢琴','管风琴','大提琴'],ans:2},
+            {type:'cn',emoji:'📏',q:'光年是什么单位？',opts:['时间','距离','速度','亮度'],ans:1},
+            {type:'cn',emoji:'🗺️',q:'世界上最大的沙漠是？',opts:['撒哈拉','阿拉伯','戈壁','卡拉哈里'],ans:0},
+            {type:'cn',emoji:'💡',q:'电灯泡的发明者？',opts:['爱迪生','特斯拉','贝尔','瓦特'],ans:0},
+            {type:'cn',emoji:'🦷',q:'成年人牙齿通常有多少颗？',opts:['28','30','32','34'],ans:2},
+            {type:'cn',emoji:'🚀',q:'第一颗人造卫星是？',opts:['探险者1号','斯普特尼克1号','东方1号','阿波罗11号'],ans:1},
+            {type:'cn',emoji:'🎹',q:'钢琴有多少个键？',opts:['76','88','96','104'],ans:1},
+            {type:'cn',emoji:'🏔️',q:'世界第二高峰是？',opts:['珠穆朗玛','乔戈里峰','干城章嘉','洛子峰'],ans:1},
+            {type:'cn',emoji:'📖',q:'《战争与和平》作者？',opts:['陀思妥耶夫斯基','托尔斯泰','屠格涅夫','契诃夫'],ans:1},
+            {type:'cn',emoji:'🌊',q:'死海位于哪个地区？',opts:['非洲','亚洲','欧洲','南美洲'],ans:1},
+            {type:'cn',emoji:'🏛️',q:'雅典卫城主要供奉哪位神？',opts:['宙斯','雅典娜','阿波罗','波塞冬'],ans:1},
+            {type:'cn',emoji:'🖼️',q:'《蒙娜丽莎》收藏于？',opts:['大英博物馆','卢浮宫','大都会','冬宫'],ans:1},
+            {type:'cn',emoji:'🔬',q:'青霉素发现者是？',opts:['巴斯德','弗莱明','科赫','詹纳'],ans:1},
+            {type:'cn',emoji:'🌐',q:'互联网诞生于哪一年？',opts:['1965','1969','1973','1980'],ans:1},
+            {type:'cn',emoji:'🎬',q:'奥斯卡金像奖首次颁发于？',opts:['1927','1929','1931','1935'],ans:1},
+            {type:'en',emoji:'📖',q:'Who wrote "The Great Gatsby"?',opts:['Hemingway','Fitzgerald','Twain','Steinbeck'],ans:1},
+            {type:'en',emoji:'🌆',q:'Capital of Australia?',opts:['Sydney','Melbourne','Canberra','Brisbane'],ans:2},
+            {type:'en',emoji:'🎤',q:'What is a polyglot?',opts:['Multilingual person','Music type','Shape','Philosopher'],ans:0},
+            {type:'en',emoji:'🍷',q:'Renaissance began in?',opts:['France','England','Italy','Spain'],ans:2},
+            {type:'en',emoji:'⚖️',q:'Habeas corpus protects?',opts:['Bear arms','Fair trial','Speech','Torture ban'],ans:1},
+            {type:'en',emoji:'🗺️',q:'Largest ocean?',opts:['Atlantic','Indian','Pacific','Arctic'],ans:2},
+            {type:'en',emoji:'🎭',q:'"To be, or not to be" from?',opts:['Macbeth','Hamlet','Othello','Lear'],ans:1},
+            {type:'en',emoji:'🧪',q:'Chemical symbol for gold?',opts:['Ag','Au','Fe','Hg'],ans:1},
+            {type:'en',emoji:'🕰️',q:'Years in a millennium?',opts:['100','500','1000','10000'],ans:2},
+            {type:'en',emoji:'🎨',q:'Sistine Chapel ceiling painter?',opts:['Da Vinci','Michelangelo','Raphael','Donatello'],ans:1},
+            {type:'en',emoji:'🏛️',q:'Colosseum location?',opts:['Athens','Rome','Istanbul','Cairo'],ans:1},
+            {type:'en',emoji:'📡',q:'GPS stands for?',opts:['Global Positioning System','General Positioning Service','Geographic Positioning Satellite','Global Placement System'],ans:0},
+            {type:'en',emoji:'🎵',q:'Instrument with 88 keys?',opts:['Violin','Piano','Organ','Guitar'],ans:1},
+            {type:'en',emoji:'🌍',q:'Largest continent?',opts:['Africa','Asia','North America','Europe'],ans:1},
+            {type:'en',emoji:'📚',q:'Author of "1984"?',opts:['Huxley','Orwell','Bradbury','Tolkien'],ans:1},
+        ];
+
+        const criminalLawQuestions = [
+            {type:'cn', emoji:'⚖️', q:'我国《刑法》第二十二条规定，为了犯罪，准备工具、制造条件的，是？', opts:['犯罪预备','犯罪未遂','犯罪中止','犯罪既遂'], ans:0},
+            {type:'cn', emoji:'⚖️', q:'我国《刑法》规定，已满多少周岁的人犯罪，应当负刑事责任？', opts:['14周岁','16周岁','18周岁','20周岁'], ans:1},
+            {type:'cn', emoji:'⚖️', q:'正当防卫明显超过必要限度造成重大损害的，应当负刑事责任，但是应当？', opts:['从轻处罚','减轻处罚','免除处罚','减轻或者免除处罚'], ans:3},
+            {type:'cn', emoji:'⚖️', q:'共同犯罪是指二人以上共同？', opts:['故意犯罪','过失犯罪','故意或过失犯罪','直接故意犯罪'], ans:0},
+            {type:'cn', emoji:'⚖️', q:'我国《刑法》规定，死刑只适用于？', opts:['罪行极其严重的犯罪分子','贪污受贿的犯罪分子','故意杀人的犯罪分子','累犯'], ans:0}
+        ];
+
+        const liberalArtsQuestions = [
+            {type:'cn', emoji:'📜', q:'我国的根本政治制度是？', opts:['人民代表大会制度','中国共产党领导的多党合作和政治协商制度','民族区域自治制度','基层群众自治制度'], ans:0},
+            {type:'cn', emoji:'🌍', q:'世界上流量最大的河流是？', opts:['尼罗河','亚马逊河','长江','密西西比河'], ans:1},
+            {type:'cn', emoji:'📖', q:'新文化运动提倡的两面旗帜是？', opts:['自由与平等','民主与科学','博爱与民权','理性与法制'], ans:1},
+            {type:'cn', emoji:'🏛️', q:'文艺复兴运动最早兴起于？', opts:['英国','法国','意大利','德国'], ans:2},
+            {type:'cn', emoji:'🌐', q:'马克思主义中国化的第一次历史性飞跃是？', opts:['邓小平理论','“三个代表”重要思想','科学发展观','毛泽东思想'], ans:3}
+        ];
+
+        const allQuestions = [...originalQuestions, ...criminalLawQuestions, ...liberalArtsQuestions];
+        return redistributeAnswers(allQuestions);
+    }
+
+    function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+
+    function loadQuestion(){
+        if(questionPool.length === 0) {
+            questionPool = shuffle(buildPool());
+        }
+        currentQuestion = questionPool.pop();
+        renderQuestion();
+        quizLocked=false;
+        $btnSkip.disabled=false;
+        $feedback.textContent='';
+    }
+
+    function renderQuestion(){
+        if(!currentQuestion) return;
+        $qEmoji.textContent=currentQuestion.emoji;
+        $qTag.textContent=currentQuestion.type==='en'?'English':'常识';
+        $qTag.className='tag '+(currentQuestion.type==='en'?'tag-en':'tag-cn');
+        $qText.textContent=currentQuestion.q;
+        $optionsGrid.innerHTML = currentQuestion.opts.map((opt,i)=>
+            `<button class="option-btn" data-idx="${i}">${String.fromCharCode(65+i)}. ${opt}</button>`
+        ).join('');
+        document.querySelectorAll('.option-btn').forEach(btn=>{
+            btn.onclick = ()=> handleAnswer(parseInt(btn.dataset.idx));
+        });
+    }
+
+    function handleAnswer(idx){
+        if(quizLocked || !currentQuestion) return;
+        quizLocked=true;
+        const correct = currentQuestion.ans;
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b=>b.disabled=true);
+        $btnSkip.disabled=true;
+        if(idx===correct){
+            btns[idx].classList.add('correct');
+            spinChances++;
+            $feedback.innerHTML='✅ 正确！获得1次转盘机会！';
+            if(Math.random() < 0.15){
+                stickers++;
+                $feedback.innerHTML += ' 还额外获得🎖️1贴纸！';
+            }
+            $feedback.style.color='#5cb878';
+            spawnParticles('🎉',8);
+        } else {
+            btns[idx].classList.add('wrong');
+            btns[correct].classList.add('correct');
+            $feedback.innerHTML='❌ 错误，正确答案是 '+currentQuestion.opts[correct];
+            $feedback.style.color='#e05555';
+        }
+        updateUI();
+        setTimeout(loadQuestion, 1800);
+    }
+
+    function skipQuestion(){
+        if(quizLocked || !currentQuestion) return;
+        if(coins<=0){ $feedback.innerHTML='金币不足！'; $feedback.style.color='#e05555'; return; }
+        coins--;
+        updateUI();
+        questionPool.push(currentQuestion);
+        loadQuestion();
+        $feedback.innerHTML='⏭️ 已跳过，消耗1金币';
+        $feedback.style.color='#f0c040';
+    }
+
+    function updateUI(){
+        $coin.textContent=coins;
+        $sticker.textContent=stickers;
+        $spinBadge.textContent=spinChances;
+        $spinText.textContent=spinChances;
+        $questionRemain.textContent = questionPool.length + (currentQuestion?1:0);
+        $btnSkip.disabled = quizLocked || coins <= 0;
+        if(spinChances>0 && !isSpinning) { $btnSpin.disabled=false; $btnSpin.classList.add('ready'); }
+        else { $btnSpin.disabled=true; $btnSpin.classList.remove('ready'); }
+    }
+
+    setInterval(() => {
+        if (!quizLocked && coins === 0 && spinChances === 0) {
+            coins = 1;
+            updateUI();
+            $feedback.innerHTML = '⏰ 赠送1金币，继续挑战吧！';
+            $feedback.style.color = '#f0c040';
+        }
+    }, 60000);
+
+    $btnSpin.onclick=spin;
+    $btnSkip.onclick=skipQuestion;
+    document.addEventListener('keydown',e=>{
+        if(quizLocked) return;
+        if(e.key==='1') handleAnswer(0);
+        if(e.key==='2') handleAnswer(1);
+        if(e.key==='3') handleAnswer(2);
+        if(e.key==='4') handleAnswer(3);
+        if(e.key==='s'||e.key==='S') skipQuestion();
+        if(e.key===' ' && spinChances>0 && !isSpinning){ e.preventDefault(); spin(); }
+    });
+
+    questionPool = shuffle(buildPool());
+    loadQuestion();
+    updateUI();
+    updateCollectGrid();
+    $wheelContainer.style.transform = 'rotate(0deg)';
+    drawWheel();
+})();
+</script>
+</body>
+</html>
